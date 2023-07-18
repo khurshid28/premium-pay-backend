@@ -5,12 +5,11 @@ const checkToken = require("../middlewares/check-token.js");
 
 const router = Router();
 
-router.use(checkToken);
-router.get("/all", superController.getAllSuper);
-router.get("/get/:id", superController.getSuper);
-router.post("/create", upload.single("imageUrl"), superController.createSuper);
-router.put("/update/:id", upload.single("imageUrl"), superController.updateSuper);
-router.delete("/delete/:id", superController.deleteUser);
+router.get("/all", checkToken, superController.getAllSuper);
+router.get("/get/:id", checkToken, superController.getSuper);
+router.post("/create", checkToken, upload.single("imageUrl"), superController.createSuper);
+router.put("/update/:id", checkToken, upload.single("imageUrl"), superController.updateSuper);
+router.delete("/delete/:id", checkToken, superController.deleteUser);
 
 module.exports = router;
 
@@ -39,6 +38,34 @@ module.exports = router;
  *         description: You can't log in different device or You do not have permission to access this resource
  *       500:
  *         description: The error from backend
+ * /super/get/{id}:
+ *   get:
+ *     tags:
+ *       - Super admin
+ *     summary: Get super admin by id
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         description: ID of super admin to retrieve
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: objectid
+ *     responses:
+ *       200:
+ *         description: Super fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Super'
+ *       401:
+ *         description: No token provided or Invalid token
+ *       403:
+ *         description: You can't log in different device
+ *       500:
+ *         description: The error from backend
  * /super/create:
  *   post:
  *     tags:
@@ -49,12 +76,13 @@ module.exports = router;
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
  *               imageUrl:
  *                 type: string
+ *                 format: binary
  *               fullName:
  *                 type: string
  *               phoneNumber:
@@ -62,34 +90,10 @@ module.exports = router;
  *                 pattern: '^\+998([378]{2}|(9[013-57-9]))\d{7}$'
  *               email:
  *                 type: string
- *               birthDate:
- *                 type: string
- *                 format: date-time
- *               gender:
- *                  type: string
- *                  enum: ["Мужской", "Женский"]
- *               address:
- *                 type: object
- *                 properties:
- *                   region:
- *                     type: string
- *                     required: true
- *                   city:
- *                     type: string
- *                     required: true
- *                   homeAddress:
- *                     type: string
- *                     required: true
- *               description:
- *                 type: string
  *             required:
  *               - fullName
  *               - phoneNumber
  *               - email
- *               - birthDate
- *               - gender
- *               - address
- *               - description
  *     responses:
  *       201:
  *         description: Super admin created successfully
@@ -132,12 +136,13 @@ module.exports = router;
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
  *               imageUrl:
  *                 type: string
+ *                 format: binary
  *               fullName:
  *                 type: string
  *               phoneNumber:
@@ -145,34 +150,6 @@ module.exports = router;
  *                 pattern: '^\+998([378]{2}|(9[013-57-9]))\d{7}$'
  *               email:
  *                 type: string
- *               birthDate:
- *                 type: string
- *                 format: date-time
- *               gender:
- *                  type: string
- *                  enum: ["Мужской", "Женский"]
- *               address:
- *                 type: object
- *                 properties:
- *                   region:
- *                     type: string
- *                     required: true
- *                   city:
- *                     type: string
- *                     required: true
- *                   homeAddress:
- *                     type: string
- *                     required: true
- *               description:
- *                 type: string
- *             required:
- *               - fullName
- *               - phoneNumber
- *               - email
- *               - birthDate
- *               - gender
- *               - address
- *               - description
  *     responses:
  *       200:
  *         description: Super admin updated successfully
@@ -236,32 +213,8 @@ module.exports = router;
  *             pattern: '^\+998([378]{2}|(9[013-57-9]))\d{7}$'
  *           email:
  *             type: string
- *           birthDate:
- *             type: string
- *             format: date-time
- *           gender:
- *             type: string
- *             enum: ["Мужской", "Женский"]
- *           address:
- *             type: object
- *             properties:
- *               region:
- *                 type: string
- *                 required: true
- *               city:
- *                 type: string
- *                 required: true
- *               homeAddress:
- *                 type: string
- *                 required: true
- *           description:
- *             type: string
  *         required:
  *           - fullName
  *           - phoneNumber
  *           - email
- *           - birthDate
- *           - gender
- *           - address
- *           - description
  */

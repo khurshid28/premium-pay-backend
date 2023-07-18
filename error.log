@@ -1,0 +1,2 @@
+/api/user/update/643fea2fba6c173055728899___PUT___1682518113664___InternalServerError___Cannot access 'user' before initialization
+/api/user/update/643fea2fba6c173055728899___PUT___1682518634088___InternalServerError___User validation failed: phoneNumber: Path `phoneNumber` is required., email: Path `email` is required., birthDate: Path `birthDate` is required., gender: Path `gender` is required., address: Path `address` is required., description: Path `description` is required.

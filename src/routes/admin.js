@@ -1,35 +1,29 @@
 const { Router } = require("express");
 const upload = require("../utils/upload.js");
-const userController = require("../controllers/user.js");
+const adminController = require("../controllers/admin.js");
 const checkToken = require("../middlewares/check-token.js");
 
 const router = Router();
 
-router.post("/login", userController.userLogin);
-router.get("/all", checkToken, userController.getAllUsers);
-router.get("/get/:id", checkToken, userController.getUser);
-router.post("/create", checkToken, upload.single("imageUrl"), userController.createUser);
-router.put("/update/:id", checkToken, upload.single("imageUrl"), userController.updateUser);
-router.delete("/delete/:id", checkToken, userController.deleteUser);
+router.post("/login", adminController.adminLogin);
+router.get("/all", checkToken, adminController.getAllAdmin);
+router.get("/get/:id", checkToken, adminController.getAdmin);
+router.post("/create", checkToken, upload.single("imageUrl"), adminController.createAdmin);
+router.put("/update/:id", checkToken, upload.single("imageUrl"), adminController.updateAdmin);
+router.delete("/delete/:id", checkToken, adminController.deleteAdmin);
 
 module.exports = router;
 
 /**
  * @openapi
- * components:
- *   securitySchemes:
- *     bearerAuth:
- *       type: http
- *       scheme: bearer
- *       bearerFormat: JWT
  * tags:
- *   - name: User
- *     description: Operations for managing User endpoints
- * /login:
+ *   - name: Admin
+ *     description: Operations for managing Admin endpoints
+ * /admin/login:
  *   post:
  *     tags:
- *       - User
- *     summary: Login a user
+ *       - Admin
+ *     summary: Login admins or super admins
  *     requestBody:
  *       required: true
  *       content:
@@ -58,14 +52,14 @@ module.exports = router;
  *               properties:
  *                 data:
  *                   type: object
- *                   description: The user object
+ *                   description: The admin object
  *                 message:
  *                   type: string
  *                   description: A success message
  *                   example: Here is your token bro
  *                 token:
  *                   type: string
- *                   description: The JSON Web Token (JWT) for the user session
+ *                   description: The JSON Web Token (JWT) for the admin session
  *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MTRmMWQ2Y2I5ZTE3YTMyZjEyYzM0NzciLCJhZ2VudCI6IjEiLCJyb2xlIjoidXNlciIsImlhdCI6MTYzNDYyMzYyMywiZXhwIjoxNjM0NjI3MjIzfQ.Tv6l-GhqfU_5mEjfyxB9_ZPZrAmCxW60ZsiRg1jK7zI
  *       '400':
  *         description: Bad request
@@ -73,59 +67,59 @@ module.exports = router;
  *         description: Invalid login credentials!
  *       '500':
  *         description: The error from backend
- * /user/all:
+ * /admin/all:
  *   get:
  *     tags:
- *       - User
- *     summary: Endpoint to get all users
+ *       - Admin
+ *     summary: Endpoint to get all admins
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Users fetched successfully
+ *         description: Admins fetched successfully
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/User'
+ *               $ref: '#/components/schemas/Admin'
  *       401:
  *         description: No token provided or Invalid token
  *       403:
- *         description: You can't log in different device
+ *         description: You can't log in different device or You do not have permission to access this resource
  *       500:
  *         description: The error from backend
- * /user/get/{id}:
+ * /admin/get/{id}:
  *   get:
  *     tags:
- *       - User
- *     summary: Get user by id
+ *       - Admin
+ *     summary: Get admin by id
  *     security:
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
- *         description: ID of user to retrieve
+ *         description: ID of admin to retrieve
  *         required: true
  *         schema:
  *           type: string
  *           format: objectid
  *     responses:
  *       200:
- *         description: User fetched successfully
+ *         description: Admin fetched successfully
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/User'
+ *               $ref: '#/components/schemas/Admin'
  *       401:
  *         description: No token provided or Invalid token
  *       403:
  *         description: You can't log in different device
  *       500:
  *         description: The error from backend
- * /user/create:
+ * /admin/create:
  *   post:
  *     tags:
- *       - User
- *     summary: Create new user
+ *       - Admin
+ *     summary: Create new admin
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -145,37 +139,13 @@ module.exports = router;
  *                 pattern: '^\+998([378]{2}|(9[013-57-9]))\d{7}$'
  *               email:
  *                 type: string
- *               birthDate:
- *                 type: string
- *                 format: date-time
- *               gender:
- *                  type: string
- *                  enum: ["Мужской", "Женский"]
- *               address:
- *                 type: object
- *                 properties:
- *                   region:
- *                     type: string
- *                     required: true
- *                   city:
- *                     type: string
- *                     required: true
- *                   homeAddress:
- *                     type: string
- *                     required: true
- *               description:
- *                 type: string
  *             required:
  *               - fullName
  *               - phoneNumber
  *               - email
- *               - birthDate
- *               - gender
- *               - address
- *               - description
  *     responses:
  *       201:
- *         description: User created successfully
+ *         description: Admin created successfully
  *         content:
  *           application/json:
  *             schema:
@@ -190,25 +160,25 @@ module.exports = router;
  *                   maxLength: 15
  *                   example: "X8p4Mq3Ls6tG7wZ"
  *       400:
- *         description: A user with the given phone number already exists
+ *         description: A admin with the given phone number already exists
  *       401:
  *         description: No token provided or Invalid token
  *       403:
  *         description: You can't log in different device or You do not have permission to access this resource
  *       500:
  *         description: The error from backend
- * /user/update/{id}:
+ * /admin/update/{id}:
  *   put:
  *     tags:
- *       - User
- *     summary: Update user by ID
+ *       - Admin
+ *     summary: Update admin by ID
  *     security:
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         description: The ID of the user to update
+ *         description: The ID of the admin to update
  *         schema:
  *           type: string
  *           format: ObjectId
@@ -229,57 +199,37 @@ module.exports = router;
  *                 pattern: '^\+998([378]{2}|(9[013-57-9]))\d{7}$'
  *               email:
  *                 type: string
- *               birthDate:
- *                 type: string
- *                 format: date-time
- *               gender:
- *                  type: string
- *                  enum: ["Мужской", "Женский"]
- *               address:
- *                 type: object
- *                 properties:
- *                   region:
- *                     type: string
- *                     required: true
- *                   city:
- *                     type: string
- *                     required: true
- *                   homeAddress:
- *                     type: string
- *                     required: true
- *               description:
- *                 type: string
  *     responses:
  *       200:
- *         description: User updated successfully
+ *         description: Admin updated successfully
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/User'
+ *               $ref: '#/components/schemas/Admin'
  *       401:
  *         description: No token provided or Invalid token
  *       403:
  *         description: You can't log in different device
  *       500:
  *         description: The error from backend
- * /user/delete/{id}:
+ * /admin/delete/{id}:
  *   delete:
  *     tags:
- *       - User
- *     summary: Delete user by id
+ *       - Admin
+ *     summary: Delete admin by id
  *     security:
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
- *         description: ID of user to delete
+ *         description: ID of admin to delete
  *         required: true
  *         schema:
  *           type: string
  *           format: objectid
  *     responses:
  *       200:
- *         description: User deleted
+ *         description: Admin deleted
  *       401:
  *         description: No token provided or Invalid token
  *       403:
@@ -292,7 +242,7 @@ module.exports = router;
  * @swagger
  *   components:
  *     schemas:
- *       User:
+ *       Admin:
  *         type: object
  *         properties:
  *           _id:
@@ -312,32 +262,8 @@ module.exports = router;
  *             pattern: '^\+998([378]{2}|(9[013-57-9]))\d{7}$'
  *           email:
  *             type: string
- *           birthDate:
- *             type: string
- *             format: date-time
- *           gender:
- *             type: string
- *             enum: ["Мужской", "Женский"]
- *           address:
- *             type: object
- *             properties:
- *               region:
- *                 type: string
- *                 required: true
- *               city:
- *                 type: string
- *                 required: true
- *               homeAddress:
- *                 type: string
- *                 required: true
- *           description:
- *             type: string
  *         required:
  *           - fullName
  *           - phoneNumber
  *           - email
- *           - birthDate
- *           - gender
- *           - address
- *           - description
  */

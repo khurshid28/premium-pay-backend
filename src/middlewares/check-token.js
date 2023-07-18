@@ -1,6 +1,6 @@
 const jwt = require("../utils/jwt.js");
-const User = require("../models/User.js");
 const Super = require("../models/Super.js");
+const Admin = require("../models/Admin.js");
 const {
 	AuthorizationError,
 	ForbiddenError,
@@ -19,7 +19,7 @@ module.exports = async (req, res, next) => {
 		}
 
 		const { userId, agent, role } = jwt.verify(token);
-		const user = (await User.findById(userId)) || (await Super.findById(userId));
+		const user = (await Admin.findById(userId)) || (await Super.findById(userId));
 		if (!user) {
 			return next(new AuthorizationError(401, "Invalid token"));
 		}

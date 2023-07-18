@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const superSchema = new mongoose.Schema(
+const adminSchema = new mongoose.Schema(
 	{
 		loginName: {
 			type: String,
@@ -30,14 +30,14 @@ const superSchema = new mongoose.Schema(
 		},
 		role: {
 			type: String,
-			default: "super_admin"
+			default: "admin"
 		}
 	},
 	{ timestamps: true }
 );
 
-superSchema.index({ phoneNumber: 1 });
+adminSchema.index({ phoneNumber: 1 });
 
-const Super = mongoose.model("Super", superSchema);
+const Admin = mongoose.model("Admin", adminSchema);
 
-module.exports = Super;
+module.exports = Admin;

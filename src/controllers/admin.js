@@ -1,14 +1,56 @@
+const jwt = require("../utils/jwt.js");
 const Super = require("../models/Super.js");
+const Admin = require("../models/Admin.js");
 const cryptoRandomString = require("secure-random-string");
 const {
 	InternalServerError,
 	ForbiddenError,
 	BadRequestError,
 	NotFoundError,
+	AuthorizationError,
 } = require("../utils/errors.js");
 
-class SuperAdmin {
-	async getAllSuper(req, res, next) {
+class Admins {
+	async adminLogin(req, res, next) {
+		try {
+			const { loginName, loginPassword } = req.body;
+
+			const admin =
+				(await Admin.findOne({ loginName })) ||
+				(await Super.findOne({ loginName }));
+			if (!admin || admin.loginPassword !== loginPassword) {
+				return next(new AuthorizationError(401, "Invalid login credentials!"));
+			}
+
+			const token = jwt.sign({
+				userId: admin._id,
+				agent: req.headers["user-agent"],
+				role: admin.role,
+			});
+
+			return res.status(200).json({
+				data: {
+					fullName: admin.fullName,
+					imageUrl: admin.imageUrl,
+					role: admin.role,
+				},
+				message: "Here is your token",
+				token,
+			});
+		} catch (error) {
+			if (error.name === "ValidationError") {
+				let errors = {};
+		  
+				Object.keys(error.errors).forEach((key) => {
+					errors[key] = error.errors[key].message;
+				});
+		  
+				return res.status(400).send(errors);
+			}
+			return next(new InternalServerError(500, error.message));
+		}
+	}
+	async getAllAdmin(req, res, next) {
 		try {
 			if (req.user.role !== "super_admin") {
 				return next(
@@ -18,13 +60,13 @@ class SuperAdmin {
 					)
 				);
 			}
-			const supers = await Super.find({ role: "super_admin" });
-			return res.status(200).send(supers);
+			const admins = await Admin.find();
+			return res.status(200).send(admins);
 		} catch (error) {
 			return next(new InternalServerError(500, error.message));
 		}
 	}
-	async getSuper(req, res, next) {
+	async getAdmin(req, res, next) {
 		try {
 			if (req.user.role !== "super_admin") {
 				return next(
@@ -34,13 +76,13 @@ class SuperAdmin {
 					)
 				);
 			}
-			const superr = await Super.findById(req.params.id);
-			return res.status(200).send(superr);
+			const user = await Admin.findById(req.params.id);
+			return res.status(200).send(user);
 		} catch (error) {
 			return next(new InternalServerError(500, error.message));
 		}
 	}
-	async createSuper(req, res, next) {
+	async createAdmin(req, res, next) {
 		try {
 			if (req.user.role !== "super_admin") {
 				return next(
@@ -57,8 +99,8 @@ class SuperAdmin {
 			const loginName = cryptoRandomString({ length: 10 });
 			const loginPassword = cryptoRandomString({ length: 15 });
 
-			const existingUser = await Super.exists({ phoneNumber });
-			if (existingUser) {
+			const existingAdmin = await Admin.exists({ phoneNumber });
+			if (existingAdmin) {
 				return next(
 					new BadRequestError(
 						400,
@@ -67,7 +109,7 @@ class SuperAdmin {
 				);
 			}
 
-			await Super.create({
+			await Admin.create({
 				loginName,
 				loginPassword,
 				imageUrl,
@@ -81,7 +123,7 @@ class SuperAdmin {
 				let errors = {};
 		  
 				Object.keys(error.errors).forEach((key) => {
-					errors[key] = error.errors[key].message;
+				  errors[key] = error.errors[key].message;
 				});
 		  
 				return res.status(400).send(errors);
@@ -89,9 +131,9 @@ class SuperAdmin {
 			return next(new InternalServerError(500, error.message));
 		}
 	}
-	async updateSuper(req, res, next) {
+	async updateAdmin(req, res, next) {
 		try {
-			if (req.superr.role !== "super_admin") {
+			if (req.user.role !== "super_admin") {
 				return next(
 					new ForbiddenError(
 						403,
@@ -102,23 +144,23 @@ class SuperAdmin {
 			const { fullName, phoneNumber, email } = req.body;
 			let image = req.file ? req.file.filename : null; // use null if no file was uploaded
 
-			const superr = await Super.findById(req.params.id);
-			if (!superr) {
-				return next(new NotFoundError(404, "Super admin not found"));
+			const user = await Admin.findById(req.params.id);
+			if (!user) {
+				return next(new NotFoundError(404, "Admin not found"));
 			}
 
-			superr.imageUrl = image ? image : superr.imageUrl;
-			superr.fullName = fullName || superr.fullName;
-			superr.phoneNumber = phoneNumber || superr.phoneNumber;
-			superr.email = email || superr.email;
+			user.imageUrl = image ? image : user.imageUrl;
+			user.fullName = fullName || user.fullName;
+			user.phoneNumber = phoneNumber || user.phoneNumber;
+			user.email = email || user.email;
 
-			await superr.save();
+			await user.save();
 
 			return res
 				.status(200)
 				.send({
 					message: "Successfully updated",
-					data: { superID: req.params.id },
+					data: { adminID: req.params.id },
 				});
 		} catch (error) {
 			if (error.name === "ValidationError") {
@@ -133,7 +175,7 @@ class SuperAdmin {
 			return next(new InternalServerError(500, error.message));
 		}
 	}
-	async deleteUser(req, res, next) {
+	async deleteAdmin(req, res, next) {
 		try {
 			if (req.user.role !== "super_admin") {
 				return next(
@@ -144,14 +186,14 @@ class SuperAdmin {
 				);
 			}
 
-			const superr = await Super.findById(req.params.id);
-			if (!superr) {
-				return next(new NotFoundError(404, "Super not found!"));
+			const user = await Admin.findById(req.params.id);
+			if (!user) {
+				return next(new NotFoundError(404, "Admin not found!"));
 			}
 
-			await Super.deleteOne({ _id: req.params.id });
+			await Admin.deleteOne({ _id: req.params.id });
 
-			return res.status(200).send({ message: "Super deleted" });
+			return res.status(200).send({ message: "Admin deleted" });
 		} catch (error) {
 			if (error.name === "ValidationError") {
 				let errors = {};
@@ -167,4 +209,4 @@ class SuperAdmin {
 	}
 }
 
-module.exports = new SuperAdmin();
+module.exports = new Admins();

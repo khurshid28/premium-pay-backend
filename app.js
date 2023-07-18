@@ -19,6 +19,11 @@ const app = express();
 // testing server
 app.get("/", (req, res) => res.send("premium pay"));
 
+app.use((req, res, next) => {
+	res.set("Cross-Origin-Opener-Policy", "none");
+	next();
+});
+
 // PORT
 const PORT = process.env.PORT || 8090;
 
