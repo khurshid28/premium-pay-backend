@@ -11,13 +11,13 @@ const mockRouter = require("./mock.js");
 // const requestRouter = require("./request.js");
 const swaggerDoc = require("../docs/swagger.js");
 
-router.use("/api/user", userRouter);
-router.use("/api/super", superRouter);
-router.use("/api/admin", adminRouter);
-router.use("/api", extraRouter);
-router.use("/api/mock", mockRouter);
-// router.use("/api/request", requestRouter);
+router.use("/user", userRouter);
+router.use("/super", superRouter);
+router.use("/admin", adminRouter);
+router.use("/", extraRouter);
+router.use("/mock", mockRouter);
+// router.use("/request", requestRouter);
 
-router.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerDoc));
+router.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDoc));
 
 module.exports = router;

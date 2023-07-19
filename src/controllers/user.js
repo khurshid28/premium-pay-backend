@@ -114,6 +114,7 @@ class Users {
 				address,
 				description,
 			});
+
 			return res.status(201).json({ loginName, loginPassword });
 		} catch (error) {
 			if (error.name === "ValidationError") {

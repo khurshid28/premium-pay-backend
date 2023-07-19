@@ -1,15 +1,15 @@
 const { Router } = require("express");
 const upload = require("../utils/upload.js");
 const superController = require("../controllers/super.js");
-const checkToken = require("../middlewares/check-token.js");
+const checkAdmin = require("../middlewares/check-token.js");
 
 const router = Router();
 
-router.get("/all", checkToken, superController.getAllSuper);
-router.get("/get/:id", checkToken, superController.getSuper);
-router.post("/create", checkToken, upload.single("imageUrl"), superController.createSuper);
-router.put("/update/:id", checkToken, upload.single("imageUrl"), superController.updateSuper);
-router.delete("/delete/:id", checkToken, superController.deleteUser);
+router.get("/all", checkAdmin, superController.getAllSuper);
+router.get("/get/:id", checkAdmin, superController.getSuper);
+router.post("/create", checkAdmin, upload.single("imageUrl"), superController.createSuper);
+router.put("/update/:id", checkAdmin, upload.single("imageUrl"), superController.updateSuper);
+router.delete("/delete/:id", checkAdmin, superController.deleteUser);
 
 module.exports = router;
 

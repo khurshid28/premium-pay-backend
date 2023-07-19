@@ -19,22 +19,33 @@ const app = express();
 // testing server
 app.get("/", (req, res) => res.send("premium pay"));
 
-app.use((req, res, next) => {
-	res.set("Cross-Origin-Opener-Policy", "none");
-	next();
-});
-
 // PORT
 const PORT = process.env.PORT || 8090;
 
-// middlewares
-app.use(morgan("dev"), cors(), helmet(), rateLimit(), express.json());
+// Custom token for formatted date
+morgan.token("customDateTime", function () {
+	const currentDate = new Date()
+		.toISOString()
+		.replace(/T/, " ")
+		.replace(/\..+/, "");
+	return currentDate;
+});
+
+// Middlewares
+app.use(cors());
+app.use(helmet());
+app.use(rateLimit());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Morgan middleware after other middlewares
+app.use(morgan(":customDateTime :method :url :status :response-time ms"));
 
 // auth for APIs
 // app.use(authenticateToken);
 
 // all routes
-app.use(router);
+app.use("/api", router);
 
 // error handling
 app.use(errorHandler);
