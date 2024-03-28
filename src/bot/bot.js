@@ -589,32 +589,32 @@ bot.on("message", async (msg) => {
           );
         });
 
-        // let conceled_zayavkalar =
-        //   zayavkalar2[0]["count(id)"] +
-        //   zayavkalar3[0]["count(id)"] +
-        //   zayavkalar4[0]["count(id)"];
-        // let paid_zayavkalar = zayavkalar8[0]["count(id)"];
-        // let summa = zayavkalar8[0]["sum(payment_amount)"];
-        // let finished_zayavkalar = zayavkalar5[0]["count(id)"];
-        // console.log(JSON.stringify(zayavkalar5[0]["count(id)"]));
-
-        // bot.sendMessage(
-        //   chatId,
-        //   `-- Statistika --\n
-        //   ${start} dan ${end} gacha \nUmumiy Zayavkalar :${
-        //     zayavkalar9[0]["count(id)"]
-        //   }\nuspeshna : ${finished_zayavkalar} \npul ko'chirilgan : ${paid_zayavkalar} ^ ${toMoney(
-        //     Math.floor(summa)
-        //   )} \nscoring otkaz : ${zayavkalar2[0]["count(id)"]}`
-        // );
+        let conceled_zayavkalar =
+          zayavkalar2[0]["count(id)"] +
+          zayavkalar3[0]["count(id)"] +
+          zayavkalar4[0]["count(id)"];
+        let paid_zayavkalar = zayavkalar8[0]["count(id)"];
+        let summa = zayavkalar8[0]["sum(payment_amount)"];
+        let finished_zayavkalar = zayavkalar5[0]["count(id)"];
+        console.log(JSON.stringify(zayavkalar5[0]["count(id)"]));
 
         bot.sendMessage(
           chatId,
-          `-- Statistika --
-        \n${start} dan ${end} gacha \nUmumiy Zayavkalar :20\nuspeshna : 20 \npul ko'chirilgan : 20 ^ ${toMoney(
-          Math.floor(50000)
-        )} \nscoring otkaz : 20`
+          `-- Statistika --\n
+          ${start} dan ${end} gacha \nUmumiy Zayavkalar :${
+            zayavkalar9[0]["count(id)"]
+          }\nuspeshna : ${finished_zayavkalar} \npul ko'chirilgan : ${paid_zayavkalar} ^ ${toMoney(
+            Math.floor(summa)
+          )} \nscoring otkaz : ${zayavkalar2[0]["count(id)"]}`
         );
+
+        // bot.sendMessage(
+        //   chatId,
+        //   `-- Statistika --
+        // \n${start} dan ${end} gacha \nUmumiy Zayavkalar :20\nuspeshna : 20 \npul ko'chirilgan : 20 ^ ${toMoney(
+        //   Math.floor(50000)
+        // )} \nscoring otkaz : 20`
+        // );
       }
     } else {
       var filePath = path.join(
