@@ -39,6 +39,7 @@ bot.on("message", async (msg) => {
   // let user = userData[chatId] ?? { currentState :"start"}
   console.log(userData[chatId].currentState);
   if (msg.text == "/start") {
+    //console.log(userData[chatId])
     //  if (userData[chatId].currentState == "done" || msg.photo) {
     //    bot.sendMessage(
     //      chatId,
