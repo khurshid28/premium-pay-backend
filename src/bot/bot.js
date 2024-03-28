@@ -487,6 +487,135 @@ bot.on("message", async (msg) => {
       } catch (error) {
         console.log(error);
       }
+    } else if (msg.text.split("T").length == 2) {
+      let start = msg.text.split("T")[0];
+      console.log(start);
+
+      let end = msg.text.split("T")[1];
+      console.log(end);
+      if (start.split("-").length != 3 || end.split("-").length != 3) {
+        await bot.sendMessage(
+          chatId,
+          `Iltimos Siz ko'rmoqchi bo'lgan statistika sanasini \nyyyy-mm-dd T yyyy-mm-dd formatda yozing !  `
+        );
+      } else {
+        zayavkalar1 = await new Promise(function (resolve, reject) {
+          //('2024-01-31' < Date(created_time - interval 5 hour) and Date(created_time - interval 5 hour) < '2024-03-01')
+          db.query(
+            `SELECT count(id)  from Zayavka WHERE  status='progress' and (${start} < Date(created_time - interval 5 hour) and Date(created_time - interval 5 hour) < ${end});`,
+            function (err, results, fields) {
+              if (err) {
+                resolve(null);
+                return null;
+              }
+              return resolve(results);
+            }
+          );
+        });
+        zayavkalar2 = await new Promise(function (resolve, reject) {
+          db.query(
+            `SELECT count(id)  from Zayavka WHERE  status='canceled_by_scoring' and (${start} < Date(created_time - interval 5 hour) and Date(created_time - interval 5 hour) < ${end});`,
+            function (err, results, fields) {
+              if (err) {
+                resolve(null);
+                return null;
+              }
+              return resolve(results);
+            }
+          );
+        });
+        zayavkalar3 = await new Promise(function (resolve, reject) {
+          db.query(
+            `SELECT count(id) from Zayavka WHERE  status='canceled_by_client' and (${start} < Date(created_time - interval 5 hour) and Date(created_time - interval 5 hour) < ${end});`,
+            function (err, results, fields) {
+              if (err) {
+                resolve(null);
+                return null;
+              }
+              return resolve(results);
+            }
+          );
+        });
+        zayavkalar4 = await new Promise(function (resolve, reject) {
+          db.query(
+            `SELECT count(id) from Zayavka WHERE  status='canceled_by_daily' and (${start} < Date(created_time - interval 5 hour) and Date(created_time - interval 5 hour) < ${end});`,
+            function (err, results, fields) {
+              if (err) {
+                resolve(null);
+                return null;
+              }
+              return resolve(results);
+            }
+          );
+        });
+        zayavkalar5 = await new Promise(function (resolve, reject) {
+          db.query(
+            `SELECT count(id) from Zayavka WHERE  (status='finished' or status='paid') and (${start} < Date(created_time - interval 5 hour) and Date(created_time - interval 5 hour) < ${end});`,
+            function (err, results, fields) {
+              console.log(err);
+              if (err) {
+                resolve(null);
+                return null;
+              }
+              return resolve(results);
+            }
+          );
+        });
+
+        zayavkalar8 = await new Promise(function (resolve, reject) {
+          db.query(
+            `SELECT count(id),sum(payment_amount) from Zayavka WHERE paid_status='paid' and (${start} < Date(created_time - interval 5 hour) and Date(created_time - interval 5 hour) < ${end});`,
+            function (err, results, fields) {
+              console.log(err);
+              if (err) {
+                resolve(null);
+                return null;
+              }
+              return resolve(results);
+            }
+          );
+        });
+        zayavkalar9 = await new Promise(function (resolve, reject) {
+          db.query(
+            `SELECT count(id) from Zayavka WHERE (${start} < Date(created_time - interval 5 hour) and Date(created_time - interval 5 hour) < ${end});`,
+            function (err, results, fields) {
+              console.log(err);
+              if (err) {
+                resolve(null);
+                return null;
+              }
+              return resolve(results);
+            }
+          );
+        });
+
+        // let conceled_zayavkalar =
+        //   zayavkalar2[0]["count(id)"] +
+        //   zayavkalar3[0]["count(id)"] +
+        //   zayavkalar4[0]["count(id)"];
+        // let paid_zayavkalar = zayavkalar8[0]["count(id)"];
+        // let summa = zayavkalar8[0]["sum(payment_amount)"];
+        // let finished_zayavkalar = zayavkalar5[0]["count(id)"];
+        // console.log(JSON.stringify(zayavkalar5[0]["count(id)"]));
+
+        // bot.sendMessage(
+        //   chatId,
+        //   `-- Statistika --\n
+        //   ${start} dan ${end} gacha \nUmumiy Zayavkalar :${
+        //     zayavkalar9[0]["count(id)"]
+        //   }\nuspeshna : ${finished_zayavkalar} \npul ko'chirilgan : ${paid_zayavkalar} ^ ${toMoney(
+        //     Math.floor(summa)
+        //   )} \nscoring otkaz : ${zayavkalar2[0]["count(id)"]}`
+        // );
+
+        bot.sendMessage(
+          chatId,
+          `-- Statistika --
+        \n${start} dan ${end} gacha \nUmumiy Zayavkalar :20\nuspeshna : 20 \npul ko'chirilgan : 20 ^ ${toMoney(
+          Math.floor(50000)
+        )} \nscoring otkaz : 20`
+        );
+      }
     } else {
       var filePath = path.join(
         __dirname,
